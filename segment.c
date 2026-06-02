@@ -35,7 +35,7 @@ void segment_function(int* arg) {
     }
     
     softToneWrite(SPKR, 2000);
-    delay(100);
+    delay(1000);
     softToneWrite(SPKR, 0);
     pthread_cleanup_pop(1);
 }
