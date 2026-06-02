@@ -1,4 +1,3 @@
-#pragma once
 #include "cds.h"
 
 void cds_function(int* threshold) {

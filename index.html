@@ -13,6 +13,21 @@
     <button onclick="fetch('/led_low')">LED LOW</button>
     <button onclick="fetch('/led_medium')">LED MEDIUM</button>
     <button onclick="fetch('/led_high')">LED HIGH</button>
+
+    <hr>
+    <input type="number" id="threshold" placeholder="Threshold 입력">
+    <button onclick="setThreshold()">CDS Start</button>
+
+    <script>
+        function setThreshold() {
+            const val = document.getElementById('threshold').value;
+            if (val === '') {
+                alert('Threshold 값을 입력하세요');
+                return;
+            }
+            fetch('/cds_start/' + val);
+        }
+    </script>
 </body>
 
 </html>
