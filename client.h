@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <signal.h>
+#include <unistd.h>
 
 #define SERVER_IP "100.82.123.25"
 #define SERVER_PORT 60000
