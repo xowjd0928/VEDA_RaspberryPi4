@@ -27,8 +27,6 @@ void* led_function(void* arg) {
 
     fptr((char*)arg);
 
-    dlclose(handle);
-
     return(NULL);
 }
 
