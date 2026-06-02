@@ -1,66 +1,86 @@
 <!DOCTYPE html>
-<html>
-<meta charset="UTF-8">
+<html lang="ko">
 <head>
-    <title>
-        Raspberry Pi Control
-    </title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry Pi Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <button onclick="fetch('/led_on')">LED ON</button>
-    <button onclick="fetch('/led_off')">LED OFF</button>
-    <button onclick="fetch('/led_low')">LED LOW</button>
-    <button onclick="fetch('/led_medium')">LED MEDIUM</button>
-    <button onclick="fetch('/led_high')">LED HIGH</button>
 
-    <hr>
-    <input type="number" id="threshold" placeholder="Input Threshold">
-    <button onclick="setThreshold()">CDS Start</button>
+    <div class="container">
+        <div class="main-title">Raspberry Pi Control Panel</div>
 
-    <script>
-        function setThreshold() {
-            const val = document.getElementById('threshold').value;
-            if (val === '') {
-                alert('Input Threshold Value!');
-                return;
-            }
+        <div class="dashboard-grid">
 
-            const num = Number(val);
-            if (!Number.isInteger(num)) {
-                alert('Please enter number only!');
-                return;
-            }
-            fetch('/cds_start/' + val);
-        }
-    </script>
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon-wrapper icon-led"><i class="fa-regular fa-lightbulb"></i></div>
+                    LED Controls
+                </div>
+                <div class="row-grid">
+                    <button class="btn btn-success" id="btn-led-on"><i class="fa-solid fa-power-off"></i> LED ON</button>
+                    <button class="btn btn-danger" id="btn-led-off"><i class="fa-solid fa-power-off"></i> LED OFF</button>
+                </div>
+                <div class="section-label">Intensity Levels</div>
+                <div class="intensity-grid">
+                    <button class="btn btn-low" id="btn-led-low">LOW</button>
+                    <button class="btn btn-med" id="btn-led-med">MED</button>
+                    <button class="btn btn-high" id="btn-led-high">HIGH</button>
+                </div>
+            </div>
 
-    <hr>
-    <button onclick="fetch('/buzzer_on')">BUZZER ON</button>
-    <button onclick="fetch('/buzzer_off')">BUZZER OFF</button>
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon-wrapper icon-buzzer"><i class="fa-solid fa-volume-high"></i></div>
+                    Buzzer Control
+                </div>
+                <button class="btn btn-success" id="btn-buzzer-on" style="margin-bottom: 16px; width: 100%;">
+                    <i class="fa-solid fa-play"></i> BUZZER ON
+                </button>
+                <button class="btn btn-danger" id="btn-buzzer-off" style="width: 100%;">
+                    <i class="fa-solid fa-square"></i> BUZZER OFF
+                </button>
+            </div>
 
-    <hr>
-    <input type="number" id="count" placeholder="Input Count">
-    <button onclick="setCount()">Segment Display</button>
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon-wrapper icon-cds"><i class="fa-solid fa-gear"></i></div>
+                    CDS Sensor Threshold
+                </div>
+                <div class="section-label">Threshold Value (0-1023)</div>
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <input type="number" class="input-field" id="input-cds" placeholder="500" min="0" max="1023" value="500">
+                    </div>
+                    <button class="btn btn-dark" id="btn-cds-submit">Set <i class="fa-solid fa-check"></i></button>
+                </div>
+                <div class="status-bar">
+                    <span>Current Reading: <strong>428</strong></span>
+                    <span>Current Threshold: <strong>500</strong></span>
+                </div>
+            </div>
 
-    <script>
-        function setCount() {
-            const val = document.getElementById('count').value;
-            if (val === '') {
-                alert('Input Count Value!');
-                return;
-            }
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon-wrapper icon-timer"><i class="fa-solid fa-hourglass-half"></i></div>
+                    Countdown Timer
+                </div>
+                <div class="section-label">Duration (Seconds, 0-9)</div>
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-clock"></i>
+                        <input type="number" class="input-field input-with-icon" id="input-timer" placeholder="ex) 5" min="0" max="9">
+                    </div>
+                    <button class="btn btn-primary" id="btn-timer-submit">Set Timer <i class="fa-solid fa-caret-right"></i></button>
+                </div>
+            </div>
 
-            const num = Number(val);
+        </div>
+    </div>
 
-            if (!Number.isInteger(num) || num < 0 || num > 9) {
-                alert('Please enter a number between 0 and 9.');
-                return;
-            }
-
-            fetch('/segment_start/' + num);
-        }
-    </script>
 </body>
-
 </html>

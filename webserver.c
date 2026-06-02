@@ -267,6 +267,10 @@ void *clnt_connection(void *arg) {
             if(filename[j] == '\0') break;
         }
     }
+
+    if (strlen(filename) == 0) {
+        strcpy(filename, "index.html");
+    }
     
     if (strcmp(filename, "led_on") == 0) {
         if (cds_thread != 0) {
@@ -425,6 +429,12 @@ int sendData(FILE* fp, char *ct, char *filename) {
     char end[ ] = "\r\n"; 			/* 응답 헤더의 끝은 항상 \r\n */
     char buf[BUFSIZ];
     int fd, len;
+
+    if (strstr(filename, ".css") != NULL) {
+        strcpy(cnt_type, "Content-Type:text/css\r\n");
+    } else {
+        strcpy(cnt_type, "Content-Type:text/html\r\n");
+    }
 
     fputs(protocol, fp);
     fputs(server, fp);

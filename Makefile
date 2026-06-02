@@ -15,6 +15,7 @@ librasp.so: $(OBJS)
 
 index:
 	-scp index.html taejeong@100.82.123.25:~/
+	-scp style.css taejeong@100.82.123.25:~/
 
 client: client.c
 	$(CC) -o $@ client.c
