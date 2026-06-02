@@ -2,6 +2,31 @@
 
 pthread_t cds_thread;
 pthread_t buzzer_thread;
+pthread_t segment_thread;
+
+void* segment_function(void* arg) {
+    void* handle;
+    void (*fptr)(int*);
+    char* error;
+
+    handle = dlopen("./librasp.so", RTLD_LAZY);
+    if (!handle) {
+        fprintf(stderr, "%s\n", dlerror());
+        exit(1);
+    }
+    dlerror();
+
+    fptr = dlsym(handle, "segment_function");
+    error = dlerror();
+    if (error != NULL) {
+        fprintf(stderr, "%s\n", error);
+        exit(1);
+    }
+
+    fptr((int*)arg);
+
+    return(NULL);
+}
 
 void* buzzer_function(void* arg) {
     void* handle;
@@ -88,6 +113,13 @@ int main(int argc, char **argv) {
 
     wiringPiSetup();
     pinMode(LED, OUTPUT);
+    pinMode(A, OUTPUT);
+    pinMode(B, OUTPUT);
+    pinMode(C, OUTPUT);
+    pinMode(D, OUTPUT);
+    pinMode(E, OUTPUT);
+    pinMode(F, OUTPUT);
+    pinMode(G, OUTPUT);
     softPwmCreate(LED, 0, 100);
     softToneCreate(SPKR);
 
@@ -286,7 +318,23 @@ void *clnt_connection(void *arg) {
         pthread_join(buzzer_thread, NULL);
         sendOk(clnt_write);
         goto END;
+    } else if (strncmp(filename, "segment_start/", 14) == 0) {
+        int num = atoi(filename + 14);
+
+        int* arg = malloc(sizeof(int));
+        *arg = num;
+        if (segment_thread != 0) {
+            pthread_cancel(segment_thread);
+            pthread_join(segment_thread, NULL);
+        }
+        if (pthread_create(&segment_thread, NULL, segment_function, arg)) {
+            perror("pthread_create");
+            exit(1);
+        }
+        sendOk(clnt_write);
+        goto END;
     }
+
     /* 메시지 헤더를 읽어서 화면에 출력하고 나머지는 무시한다. */
     do {
         fgets(reg_line, BUFSIZ, clnt_read);

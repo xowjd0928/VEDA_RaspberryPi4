@@ -15,6 +15,13 @@
 
 #define LED 1
 #define SPKR 6
+#define A 21
+#define B 22
+#define C 23
+#define D 24
+#define E 25
+#define F 26
+#define G 27
 
 /* 스레드 처리를 위한 함수 */
 static void *clnt_connection(void *arg);
@@ -25,3 +32,4 @@ void sendError(FILE* fp);
 void* led_function(void* arg);
 void* cds_function(void* arg);
 void* buzzer_function(void* arg);
+void* segment_function(void* arg);
