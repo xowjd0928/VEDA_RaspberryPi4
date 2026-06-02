@@ -1,4 +1,4 @@
-OBJS = led.o cds.o
+OBJS = led.o cds.o buzzer.o
 CC = aarch64-linux-gnu-gcc
 MFLAGS = -ldl -lpthread
 RFLAGS = -lwiringPi -lcrypt
