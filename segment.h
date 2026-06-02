@@ -1,6 +1,8 @@
+#pragma once
 #include <wiringPi.h>
 #include <softTone.h>
 #include <pthread.h>
+#include <stdlib.h>
 
 #define A 21
 #define B 22
