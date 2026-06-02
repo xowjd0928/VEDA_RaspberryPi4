@@ -3,7 +3,7 @@ CC = aarch64-linux-gnu-gcc
 MFLAGS = -ldl -lpthread
 RFLAGS = -lwiringPi -lcrypt
 
-all: webserver librasp.so index
+all: webserver librasp.so index client
 
 webserver: webserver.o
 	$(CC) -o $@ webserver.o $(MFLAGS) $(RFLAGS)
@@ -15,6 +15,9 @@ librasp.so: $(OBJS)
 
 index:
 	-scp index.html taejeong@100.82.123.25:~/
+
+client: client.o
+	gcc -o $@ client.o
 
 %.o: %.c
 	$(CC) -c -fPIC $<
