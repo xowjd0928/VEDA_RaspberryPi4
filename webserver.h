@@ -24,3 +24,4 @@ void sendError(FILE* fp);
 
 void* led_function(void* arg);
 void* cds_function(void* arg);
+void* buzzer_function(void* arg);

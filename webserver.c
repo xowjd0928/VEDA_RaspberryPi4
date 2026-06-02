@@ -1,6 +1,31 @@
 #include "webserver.h"
 
 pthread_t cds_thread;
+pthread_t buzzer_thread;
+
+void* buzzer_function(void* arg) {
+    void* handle;
+    void (*fptr)(char*);
+    char* error;
+
+    handle = dlopen("./librasp.so", RTLD_LAZY);
+    if (!handle) {
+        fprintf(stderr, "%s\n", dlerror());
+        exit(1);
+    }
+    dlerror();
+
+    fptr = dlsym(handle, "buzzer_function");
+    error = dlerror();
+    if (error != NULL) {
+        fprintf(stderr, "%s\n", error);
+        exit(1);
+    }
+
+    fptr((char*)arg);
+
+    return(NULL);
+}
 
 void* cds_function(void* arg) {
     void* handle;
@@ -153,8 +178,6 @@ void *clnt_connection(void *arg) {
         char* arg = strdup("ON");
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
-            pthread_join(cds_thread, NULL);
-            cds_thread = 0;
         }
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
@@ -169,8 +192,6 @@ void *clnt_connection(void *arg) {
         char* arg = strdup("OFF");
         if(cds_thread != 0) {
             pthread_cancel(cds_thread);
-            pthread_join(cds_thread, NULL);
-            cds_thread = 0;
         }
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
@@ -185,8 +206,6 @@ void *clnt_connection(void *arg) {
         char* arg = strdup("LOW");
         if(cds_thread != 0) {
             pthread_cancel(cds_thread);
-            pthread_join(cds_thread, NULL);
-            cds_thread = 0;
         }
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
@@ -201,8 +220,6 @@ void *clnt_connection(void *arg) {
         char* arg = strdup("MEDIUM");
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
-            pthread_join(cds_thread, NULL);
-            cds_thread = 0;
         }
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
@@ -217,8 +234,6 @@ void *clnt_connection(void *arg) {
         char* arg = strdup("HIGH");
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
-            pthread_join(cds_thread, NULL);
-            cds_thread = 0;
         }
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
@@ -233,17 +248,34 @@ void *clnt_connection(void *arg) {
         *threshold = atoi(filename + 10);
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
-            pthread_join(cds_thread, NULL);
-            cds_thread = 0;
         }
         if (pthread_create(&cds_thread, NULL, (void*)cds_function, threshold)) {
             perror("pthread_create");
             exit(1);
         }
+        pthread_detach(cds_thread);
+        sendOk(clnt_write);
+        goto END;
+    } else if (strcmp(filename, "buzzer_on") == 0) {
+        char* arg = strdup("ON");
+        if (buzzer_thread != 0) {
+            pthread_cancel(buzzer_thread);
+        }
+        if (pthread_create(&buzzer_thread, NULL, (void*)buzzer_function, arg)) {
+            perror("pthread_create");
+            exit(1);
+        }
+        pthread_detach(buzzer_thread);
+        free(arg);
+        sendOk(clnt_write);
+        goto END;
+    } else if (strcmp(filename, "buzzer_off") == 0) {
+        if (buzzer_thread != 0) {
+            pthread_cancel(buzzer_thread);
+        }
         sendOk(clnt_write);
         goto END;
     }
-
     /* 메시지 헤더를 읽어서 화면에 출력하고 나머지는 무시한다. */
     do {
         fgets(reg_line, BUFSIZ, clnt_read);
