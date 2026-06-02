@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <time.h>
 #include <softPwm.h>
+#include <stdlib.h>
 
 #define SW 5
 #define CDS 0

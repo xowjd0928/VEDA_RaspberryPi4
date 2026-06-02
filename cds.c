@@ -7,6 +7,7 @@ void cds_function(int* threshold) {
     int prev, a2dVal;
 
     pthread_cleanup_push((void*)fclose, log);
+    pthread_cleanup_push(free, threshold);
     fprintf(log, "[CDS Control] Current Threshold Value: %d\n", *threshold);
     fflush(log);
 
@@ -34,5 +35,6 @@ void cds_function(int* threshold) {
         delay(1000);
         cnt++;
     }
+    pthread_cleanup_pop(1);
     pthread_cleanup_pop(1);
 }

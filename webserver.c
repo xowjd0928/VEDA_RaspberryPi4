@@ -174,11 +174,12 @@ void *clnt_connection(void *arg) {
     }
     
     if (strcmp(filename, "led_on") == 0) {
-        pthread_t thread;
-        char* arg = strdup("ON");
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
         }
+        pthread_t thread;
+        char* arg = strdup("ON");
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
@@ -188,11 +189,12 @@ void *clnt_connection(void *arg) {
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "led_off") == 0) {
-        pthread_t thread;
-        char* arg = strdup("OFF");
         if(cds_thread != 0) {
             pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
         }
+        pthread_t thread;
+        char* arg = strdup("OFF");
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
@@ -202,11 +204,12 @@ void *clnt_connection(void *arg) {
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "led_low") == 0) {
-        pthread_t thread;
-        char* arg = strdup("LOW");
         if(cds_thread != 0) {
             pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
         }
+        pthread_t thread;
+        char* arg = strdup("LOW");
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
@@ -216,11 +219,12 @@ void *clnt_connection(void *arg) {
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "led_medium") == 0) {
-        pthread_t thread;
-        char* arg = strdup("MEDIUM");
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
         }
+        pthread_t thread;
+        char* arg = strdup("MEDIUM");
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
@@ -230,11 +234,12 @@ void *clnt_connection(void *arg) {
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "led_high") == 0) {
-        pthread_t thread;
-        char* arg = strdup("HIGH");
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
         }
+        pthread_t thread;
+        char* arg = strdup("HIGH");
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
@@ -244,35 +249,41 @@ void *clnt_connection(void *arg) {
         sendOk(clnt_write);
         goto END;
     } else if (strncmp(filename, "cds_start/", 10) == 0) {
-        int* threshold = malloc(sizeof(int));
-        *threshold = atoi(filename + 10);
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
         }
-        if (pthread_create(&cds_thread, NULL, (void*)cds_function, threshold)) {
+        int* threshold = malloc(sizeof(int));
+        *threshold = atoi(filename + 10);
+        if (pthread_create(&cds_thread, NULL, cds_function, threshold)) {
             perror("pthread_create");
             exit(1);
         }
-        pthread_detach(cds_thread);
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "buzzer_on") == 0) {
-        char* arg = strdup("ON");
         if (buzzer_thread != 0) {
             pthread_cancel(buzzer_thread);
+            pthread_join(buzzer_thread, NULL);
         }
-        if (pthread_create(&buzzer_thread, NULL, (void*)buzzer_function, arg)) {
+        char* arg = strdup("ON");
+        if (pthread_create(&buzzer_thread, NULL, buzzer_function, arg)) {
             perror("pthread_create");
             exit(1);
         }
-        pthread_detach(buzzer_thread);
-        free(arg);
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "buzzer_off") == 0) {
         if (buzzer_thread != 0) {
             pthread_cancel(buzzer_thread);
+            pthread_join(buzzer_thread, NULL);
         }
+        char* arg = strdup("OFF");
+        if (pthread_create(&buzzer_thread, NULL, buzzer_function, arg)) {
+            perror("pthread_create");
+            exit(1);
+        }
+        pthread_join(buzzer_thread, NULL);
         sendOk(clnt_write);
         goto END;
     }
