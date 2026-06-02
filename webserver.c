@@ -49,8 +49,7 @@ void* led_function(void* arg) {
     return(NULL);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     int ssock;
     pthread_t thread;
     struct sockaddr_in servaddr, cliaddr;
@@ -65,6 +64,7 @@ int main(int argc, char **argv)
     wiringPiSetup();
     pinMode(LED, OUTPUT);
     softPwmCreate(LED, 0, 100);
+    softToneCreate(SPKR);
 
     /* 서버를 위한 소켓을 생성한다. */
     ssock = socket(AF_INET, SOCK_STREAM, 0);
@@ -109,8 +109,7 @@ int main(int argc, char **argv)
     return 0;
 }
     
-void *clnt_connection(void *arg)
-{
+void *clnt_connection(void *arg) {
     /* 스레드를 통해서 넘어온 arg를 int 형의 파일 디스크립터로 변환한다. */
     int csock = *((int*)arg);
     FILE *clnt_read, *clnt_write;
@@ -264,8 +263,7 @@ END:
     return (void*)NULL;
 }
     
-int sendData(FILE* fp, char *ct, char *filename)
-{
+int sendData(FILE* fp, char *ct, char *filename) {
     /* 클라이언트로 보낼 성공에 대한 응답 메시지 */
     char protocol[ ] = "HTTP/1.1 200 OK\r\n";
     char server[ ] = "Server:Netscape-Enterprise/6.0\r\n";
@@ -290,8 +288,7 @@ int sendData(FILE* fp, char *ct, char *filename)
     return 0;
 }
     
-void sendOk(FILE* fp)
-{
+void sendOk(FILE* fp) {
     /* 클라이언트에 보낼 성공에 대한 HTTP 응답 메시지 */
     char protocol[ ] = "HTTP/1.1 200 OK\r\n";
     char server[ ] = "Server: Netscape-Enterprise/6.0\r\n\r\n";
@@ -301,8 +298,7 @@ void sendOk(FILE* fp)
     fflush(fp);
 }
     
-void sendError(FILE* fp)
-{
+void sendError(FILE* fp) {
     /* 클라이언트로 보낼 실패에 대한 HTTP 응답 메시지 */
     char protocol[ ] = "HTTP/1.1 400 Bad Request\r\n";
     char server[ ] = "Server: Netscape-Enterprise/6.0\r\n";

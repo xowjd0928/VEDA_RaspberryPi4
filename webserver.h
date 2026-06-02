@@ -11,8 +11,10 @@
 #include <dlfcn.h>
 #include <wiringPi.h>
 #include <softPwm.h>
+#include <softTone.h>
 
 #define LED 1
+#define SPKR 6
 
 /* 스레드 처리를 위한 함수 */
 static void *clnt_connection(void *arg);
