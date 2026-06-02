@@ -12,6 +12,10 @@
 #include <wiringPi.h>
 #include <softPwm.h>
 #include <softTone.h>
+#include <signal.h>
+#include <syslog.h>
+#include <sys/stat.h>
+#include <sys/resource.h>
 
 #define LED 1
 #define SPKR 6
