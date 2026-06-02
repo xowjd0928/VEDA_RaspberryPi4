@@ -25,6 +25,12 @@
                 alert('Input Threshold Value!');
                 return;
             }
+
+            const num = Number(val);
+            if (!Number.isInteger(num)) {
+                alert('Please enter number only!');
+                return;
+            }
             fetch('/cds_start/' + val);
         }
     </script>
@@ -32,6 +38,30 @@
     <hr>
     <button onclick="fetch('/buzzer_on')">BUZZER ON</button>
     <button onclick="fetch('/buzzer_off')">BUZZER OFF</button>
+
+    <hr>
+    <input type="number" id="count" placeholder="Input Count">
+    <button onclick="setCount()">Segment Display</button>
+
+    <script>
+        function setCount() {
+            const val = document.getElementById('count').value;
+            if (val === '') {
+                alert('Input Count Value!');
+                return;
+            }
+            fetch('/segment_start/' + val);
+
+            const num = Number(val);
+
+            if (!Number.isInteger(num) || num < 0 || num > 9) {
+                alert('Please enter a number between 0 and 9.');
+                return;
+            }
+
+            fetch('/segment_start/' + num);
+        }
+    </script>
 </body>
 
 </html>
