@@ -1,26 +1,26 @@
 OBJS = led.o cds.o buzzer.o segment.o
-CC = aarch64-linux-gnu-gcc
+ARM_CC = aarch64-linux-gnu-gcc
 MFLAGS = -ldl -lpthread
 RFLAGS = -lwiringPi -lcrypt
 
 all: webserver librasp.so index client
 
 webserver: webserver.o
-	$(CC) -o $@ webserver.o $(MFLAGS) $(RFLAGS)
+	$(ARM_CC) -o $@ webserver.o $(MFLAGS) $(RFLAGS)
 	-scp webserver taejeong@100.82.123.25:~/
 
 librasp.so: $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) $(RFLAGS)
+	$(ARM_CC) -shared -o $@ $(OBJS) $(RFLAGS)
 	-scp librasp.so taejeong@100.82.123.25:~/
 
 index:
 	-scp index.html taejeong@100.82.123.25:~/
 
-client: client.o
-	gcc -o $@ client.o
+client: client.c
+	$(CC) -o $@ client.c
 
 %.o: %.c
-	$(CC) -c -fPIC $<
+	$(ARM_CC) -c -fPIC $<
 
 clean:
-	rm -f *.o webserver librasp.so
+	rm -f *.o webserver librasp.so client
