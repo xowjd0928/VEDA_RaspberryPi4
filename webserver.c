@@ -6,6 +6,30 @@ int sendData(FILE* fp, char *ct, char *filename);
 void sendOk(FILE* fp);
 void sendError(FILE* fp);
 
+void* cds_function(void* arg) {
+    void* handle;
+    void (*fptr)(int*);
+    char* error;
+
+    handle = dlopen("./librasp.so", RTLD_LAZY);
+    if (!handle) {
+        fprintf(stderr, "%s\n", dlerror());
+        exit(1);
+    }
+    dlerror();
+
+    fptr = dlsym(handle, "cds_function");
+    error = dlerror();
+    if (error != NULL) {
+        fprintf(stderr, "%s\n", error);
+        exit(1);
+    }
+
+    fptr((int*)arg);
+
+    return(NULL);
+}
+
 void* led_function(void* arg) {
     void* handle;
     void (*fptr)(char*);
@@ -179,6 +203,16 @@ void *clnt_connection(void *arg)
         }
         pthread_join(thread, NULL);
         free(arg);
+        sendOk(clnt_write);
+        goto END;
+    } else if (strncmp(filename, "cds_start/", 10) == 0) {
+        int threshold = atoi(filename + 10);
+        pthread_t thread;
+        if (pthread_create(&thread, NULL, (void*)cds_function, &threshold)) {
+            perror("pthread_create");
+            exit(1);
+        }
+        pthread_detach(thread);
         sendOk(clnt_write);
         goto END;
     }
