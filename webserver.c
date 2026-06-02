@@ -150,7 +150,40 @@ void *clnt_connection(void *arg)
         free(arg);
         sendOk(clnt_write);
         goto END;
-    } 
+    } else if (strcmp(filename, "led_low") == 0) {
+        pthread_t thread;
+        char* arg = strdup("LOW");
+        if (pthread_create(&thread, NULL, led_function, arg)) {
+            perror("pthread_create");
+            exit(1);
+        }
+        pthread_join(thread, NULL);
+        free(arg);
+        sendOk(clnt_write);
+        goto END;
+    } else if (strcmp(filename, "led_medium") == 0) {
+        pthread_t thread;
+        char* arg = strdup("MEDIUM");
+        if (pthread_create(&thread, NULL, led_function, arg)) {
+            perror("pthread_create");
+            exit(1);
+        }
+        pthread_join(thread, NULL);
+        free(arg);
+        sendOk(clnt_write);
+        goto END;
+    } else if (strcmp(filename, "led_high") == 0) {
+        pthread_t thread;
+        char* arg = strdup("HIGH");
+        if (pthread_create(&thread, NULL, led_function, arg)) {
+            perror("pthread_create");
+            exit(1);
+        }
+        pthread_join(thread, NULL);
+        free(arg);
+        sendOk(clnt_write);
+        goto END;
+    }
 
     /* 메시지 헤더를 읽어서 화면에 출력하고 나머지는 무시한다. */
     do {
