@@ -3,6 +3,7 @@
 
 <head>
     <title>
+        <meta charset="UTF-8">
         Raspberry Pi Control
     </title>
 </head>
@@ -15,14 +16,14 @@
     <button onclick="fetch('/led_high')">LED HIGH</button>
 
     <hr>
-    <input type="number" id="threshold" placeholder="Threshold 입력">
+    <input type="number" id="threshold" placeholder="Input Threshold">
     <button onclick="setThreshold()">CDS Start</button>
 
     <script>
         function setThreshold() {
             const val = document.getElementById('threshold').value;
             if (val === '') {
-                alert('Threshold 값을 입력하세요');
+                alert('Input Threshold Value!');
                 return;
             }
             fetch('/cds_start/' + val);
