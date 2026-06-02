@@ -1,8 +1,6 @@
 #include "cds.h"
 
 void cds_function(int* threshold) {
-    wiringPiSetup();
-    pinMode(LED, OUTPUT);
     FILE* log = fopen("cds.log", "a");
     int fd;
     int a2dChannel = 0;
@@ -18,6 +16,7 @@ void cds_function(int* threshold) {
 
     int cnt = 0;
     while(1) {
+        pthread_testcancel();
         time_t now = time(NULL);
         struct tm* t = localtime(&now);
         wiringPiI2CWrite(fd, 0x00 | a2dChannel);
@@ -26,11 +25,11 @@ void cds_function(int* threshold) {
         if (a2dVal < *threshold) {
             fprintf(log, "[%02d:%02d:%02d] Current CDS Value: %d (Bright)\n", t->tm_hour, t->tm_min, t->tm_sec, a2dVal);
             fflush(log);
-            digitalWrite(LED, LOW);
+            softPwmWrite(LED, 0);
         } else {
             fprintf(log, "[%02d:%02d:%02d] Current CDS Value: %d (Dark)\n", t->tm_hour, t->tm_min, t->tm_sec, a2dVal);
             fflush(log);
-            digitalWrite(LED, HIGH);
+            softPwmWrite(LED, 100);
         }
         delay(1000);
         cnt++;

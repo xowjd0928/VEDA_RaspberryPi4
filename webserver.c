@@ -1,5 +1,7 @@
 #include "webserver.h"
 
+pthread_t cds_thread;
+
 void* cds_function(void* arg) {
     void* handle;
     void (*fptr)(int*);
@@ -28,7 +30,6 @@ void* led_function(void* arg) {
     void* handle;
     void (*fptr)(char*);
     char* error;
-
     handle = dlopen("./librasp.so", RTLD_LAZY);
     if (!handle) {
         fprintf(stderr, "%s\n", dlerror());
@@ -60,6 +61,10 @@ int main(int argc, char **argv)
         printf("usage: %s <port>\n", argv[0]);
         return -1;
     }
+
+    wiringPiSetup();
+    pinMode(LED, OUTPUT);
+    softPwmCreate(LED, 0, 100);
 
     /* 서버를 위한 소켓을 생성한다. */
     ssock = socket(AF_INET, SOCK_STREAM, 0);
@@ -143,10 +148,15 @@ void *clnt_connection(void *arg)
             if(filename[j] == '\0') break;
         }
     }
-
+    
     if (strcmp(filename, "led_on") == 0) {
         pthread_t thread;
         char* arg = strdup("ON");
+        if (cds_thread != 0) {
+            pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
+            cds_thread = 0;
+        }
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
@@ -158,6 +168,11 @@ void *clnt_connection(void *arg)
     } else if (strcmp(filename, "led_off") == 0) {
         pthread_t thread;
         char* arg = strdup("OFF");
+        if(cds_thread != 0) {
+            pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
+            cds_thread = 0;
+        }
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
@@ -169,6 +184,11 @@ void *clnt_connection(void *arg)
     } else if (strcmp(filename, "led_low") == 0) {
         pthread_t thread;
         char* arg = strdup("LOW");
+        if(cds_thread != 0) {
+            pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
+            cds_thread = 0;
+        }
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
@@ -180,6 +200,11 @@ void *clnt_connection(void *arg)
     } else if (strcmp(filename, "led_medium") == 0) {
         pthread_t thread;
         char* arg = strdup("MEDIUM");
+        if (cds_thread != 0) {
+            pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
+            cds_thread = 0;
+        }
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
@@ -191,6 +216,11 @@ void *clnt_connection(void *arg)
     } else if (strcmp(filename, "led_high") == 0) {
         pthread_t thread;
         char* arg = strdup("HIGH");
+        if (cds_thread != 0) {
+            pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
+            cds_thread = 0;
+        }
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
@@ -200,16 +230,17 @@ void *clnt_connection(void *arg)
         sendOk(clnt_write);
         goto END;
     } else if (strncmp(filename, "cds_start/", 10) == 0) {
-        int threshold = atoi(filename + 10);
-        pthread_t thread;
-        if (thread != 0) {
-            pthread_cancel(thread);
+        int* threshold = malloc(sizeof(int));
+        *threshold = atoi(filename + 10);
+        if (cds_thread != 0) {
+            pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
+            cds_thread = 0;
         }
-        if (pthread_create(&thread, NULL, (void*)cds_function, &threshold)) {
+        if (pthread_create(&cds_thread, NULL, (void*)cds_function, threshold)) {
             perror("pthread_create");
             exit(1);
         }
-        pthread_detach(thread);
         sendOk(clnt_write);
         goto END;
     }

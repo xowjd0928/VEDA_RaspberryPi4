@@ -9,6 +9,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <dlfcn.h>
+#include <wiringPi.h>
+#include <softPwm.h>
+
+#define LED 1
 
 /* 스레드 처리를 위한 함수 */
 static void *clnt_connection(void *arg);

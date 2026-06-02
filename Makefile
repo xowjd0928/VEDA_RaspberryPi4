@@ -6,7 +6,7 @@ RFLAGS = -lwiringPi -lcrypt
 all: webserver librasp.so index
 
 webserver: webserver.o
-	$(CC) -o $@ webserver.o $(MFLAGS)
+	$(CC) -o $@ webserver.o $(MFLAGS) $(RFLAGS)
 	-scp webserver taejeong@100.82.123.25:~/
 
 librasp.so: $(OBJS)
