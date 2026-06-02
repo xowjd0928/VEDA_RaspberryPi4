@@ -17,3 +17,4 @@ void sendOk(FILE* fp);
 void sendError(FILE* fp);
 
 void* led_function(void* arg);
+void* cds_function(void* arg);
