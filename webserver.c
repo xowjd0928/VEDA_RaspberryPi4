@@ -202,6 +202,9 @@ void *clnt_connection(void *arg)
     } else if (strncmp(filename, "cds_start/", 10) == 0) {
         int threshold = atoi(filename + 10);
         pthread_t thread;
+        if (thread != 0) {
+            pthread_cancel(thread);
+        }
         if (pthread_create(&thread, NULL, (void*)cds_function, &threshold)) {
             perror("pthread_create");
             exit(1);
