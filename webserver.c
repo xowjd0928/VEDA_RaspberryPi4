@@ -360,6 +360,13 @@ void *clnt_connection(void *arg) {
         }
         sendOk(clnt_write);
         goto END;
+    } else if (strcmp(filename, "cds_off") == 0) {
+        if (cds_thread != 0) {
+            pthread_cancel(cds_thread);
+            pthread_join(cds_thread, NULL);
+        }
+        sendOk(clnt_write);
+        goto END;
     } else if (strcmp(filename, "buzzer_on") == 0) {
         if (buzzer_thread != 0) {
             pthread_cancel(buzzer_thread);
