@@ -75,10 +75,11 @@ int main() {
         printf("4. LED MEDIUM\n");
         printf("5. LED HIGH\n");
         printf("6. CDS Control\n");
-        printf("7. BUZZER ON\n");
-        printf("8. BUZZER OFF\n");
-        printf("9. SEGMENT COUNTDOWN\n");
-        printf("10. EXIT\n");
+        printf("7. CDS OFF\n");
+        printf("8. BUZZER ON\n");
+        printf("9. BUZZER OFF\n");
+        printf("10. SEGMENT COUNTDOWN\n");
+        printf("11. EXIT\n");
         printf(">> ");
 
         if ((choice = read_int()) == -1) {
@@ -123,16 +124,19 @@ int main() {
                 send_request(cds_path);
                 break;
             }
-
             case 7:
-                send_request("buzzer_on");
+                send_request("cds_off");
                 break;
 
             case 8:
+                send_request("buzzer_on");
+                break;
+
+            case 9:
                 send_request("buzzer_off");
                 break;
 
-            case 9: {
+            case 10: {
                 int num;
                 char seg_path[64];
 
@@ -153,7 +157,7 @@ int main() {
                 break;
             }
 
-            case 10:
+            case 11:
                 return 0;
 
             default:
