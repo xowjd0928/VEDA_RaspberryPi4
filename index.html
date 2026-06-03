@@ -22,14 +22,14 @@
                     LED Controls
                 </div>
                 <div class="row-grid">
-                    <button class="btn btn-success" id="btn-led-on"><i class="fa-solid fa-power-off"></i> LED ON</button>
-                    <button class="btn btn-danger" id="btn-led-off"><i class="fa-solid fa-power-off"></i> LED OFF</button>
+                    <button class="btn btn-success" id="btn-led-on" onclick="fetch('/led_on')"><i class="fa-solid fa-power-off"></i> LED ON</button>
+                    <button class="btn btn-danger" id="btn-led-off" onclick="fetch('/led_off')"><i class="fa-solid fa-power-off"></i> LED OFF</button>
                 </div>
                 <div class="section-label">Intensity Levels</div>
                 <div class="intensity-grid">
-                    <button class="btn btn-low" id="btn-led-low">LOW</button>
-                    <button class="btn btn-med" id="btn-led-med">MED</button>
-                    <button class="btn btn-high" id="btn-led-high">HIGH</button>
+                    <button class="btn btn-low" id="btn-led-low" onclick="fetch('/led_low')">LOW</button>
+                    <button class="btn btn-med" id="btn-led-med" onclick="fetch('/led_medium')">MED</button>
+                    <button class="btn btn-high" id="btn-led-high" onclick="fetch('/led_high')">HIGH</button>
                 </div>
             </div>
 
@@ -38,10 +38,10 @@
                     <div class="icon-wrapper icon-buzzer"><i class="fa-solid fa-volume-high"></i></div>
                     Buzzer Control
                 </div>
-                <button class="btn btn-success" id="btn-buzzer-on" style="margin-bottom: 16px; width: 100%;">
+                <button class="btn btn-success" id="btn-buzzer-on" style="margin-bottom: 16px; width: 100%;" onclick="fetch('/buzzer_on')">
                     <i class="fa-solid fa-play"></i> BUZZER ON
                 </button>
-                <button class="btn btn-danger" id="btn-buzzer-off" style="width: 100%;">
+                <button class="btn btn-danger" id="btn-buzzer-off" style="width: 100%;" onclick="fetch('/buzzer_off')">
                     <i class="fa-solid fa-square"></i> BUZZER OFF
                 </button>
             </div>
@@ -54,13 +54,17 @@
                 <div class="section-label">Threshold Value (0-1023)</div>
                 <div class="input-group">
                     <div class="input-wrapper">
-                        <input type="number" class="input-field" id="input-cds" placeholder="500" min="0" max="1023" value="500">
+                        <input type="number" class="input-field" id="threshold" placeholder="ex) 120" min="0" max="1023" value="120">
                     </div>
-                    <button class="btn btn-dark" id="btn-cds-submit">Set <i class="fa-solid fa-check"></i></button>
+                </div>
+
+                <div class="row-grid" style="margin-bottom: 16px;">
+                    <button class="btn btn-success id="btn-cds-submit" onclick="setThreshold()"><i class="fa-solid fa-play"></i>CDS START</button>
+                    <button class="btn btn-danger id="btn-cds-off" onclick="stopCDS()">Set <i class="fa-solid fa-stop"></i>CDS OFF</button>
                 </div>
                 <div class="status-bar">
-                    <span>Current Reading: <strong>428</strong></span>
-                    <span>Current Threshold: <strong>500</strong></span>
+                    <span>Status: <strong id="cds-status" style="color: #64748b;">Inactive</strong></span>
+                    <span>Current Threshold: <strong id="current-threshold">0</strong></span>
                 </div>
             </div>
 
@@ -73,14 +77,69 @@
                 <div class="input-group">
                     <div class="input-wrapper">
                         <i class="fa-regular fa-clock"></i>
-                        <input type="number" class="input-field input-with-icon" id="input-timer" placeholder="ex) 5" min="0" max="9">
+                        <input type="number" class="input-field input-with-icon" id="count" placeholder="ex) 5" min="0" max="9">
                     </div>
-                    <button class="btn btn-primary" id="btn-timer-submit">Set Timer <i class="fa-solid fa-caret-right"></i></button>
+                    <button class="btn btn-primary" id="btn-timer-submit" onclick="setCount()">Set Timer <i class="fa-solid fa-caret-right"></i></button>
                 </div>
             </div>
 
         </div>
     </div>
 
+    <script>
+        function setThreshold() {
+            const val = document.getElementById('threshold').value;
+            if (val === '') {
+                alert('Input Threshold Value!');
+                return;
+            }
+
+            const num = Number(val);
+            if (!Number.isInteger(num) || num < 0 || num > 1023) {
+                alert('Please enter a number between 0 and 1023.');
+                return;
+            }
+    
+            // 서버로 작동 명령 전송
+            fetch('/cds_start/' + val)
+                .then(() => {
+                    // 성공 시 화면 UI를 작동 중(Active) 상태로 변경
+                    document.getElementById('current-threshold').innerText = val;
+                    document.getElementById('cds-status').innerText = "Active";
+                    document.getElementById('cds-status').style.color = "#52c41a"; // 활성화: 초록색
+                });
+            }
+
+        function stopCDS() {
+            // 서버로 종료 명령 전송
+            fetch('/cds_off')
+                .then(() => {
+                    // 성공 시 화면 UI를 대기(Inactive) 상태로 변경
+                    document.getElementById('cds-status').innerText = "Inactive";
+                    document.getElementById('cds-status').style.color = "#64748b"; // 비활성화: 회색
+                    document.getElementById('current-threshold').innerText = "0"; // 임계값 초기화
+                    alert('CDS OFF');
+                });
+        }
+
+        function setCount() {
+            const val = document.getElementById('count').value;
+            if (val === '') {
+                alert('Input Count Value!');
+                return;
+            }
+
+            const num = Number(val);
+            if (!Number.isInteger(num) || num < 0 || num > 9) {
+                alert('Please enter a number between 0 and 9.');
+                return;
+            }
+
+            fetch('/segment_start/' + num)
+                .then(response => {
+                    alert('Segment timer set to ' + val + ' seconds');
+                });
+        }
+    </script>
 </body>
 </html>
