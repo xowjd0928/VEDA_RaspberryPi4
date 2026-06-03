@@ -2,3 +2,4 @@
 *.so
 webserver
 client
+client_cds.log

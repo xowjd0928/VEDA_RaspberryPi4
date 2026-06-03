@@ -5,6 +5,8 @@
 #include <arpa/inet.h>
 #include <signal.h>
 #include <unistd.h>
+#include <time.h>
+#include <pthread.h>
 
 #define SERVER_IP "100.82.123.25"
 #define SERVER_PORT 60000

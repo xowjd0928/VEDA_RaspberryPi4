@@ -54,13 +54,13 @@
                 <div class="section-label">Threshold Value (0-1023)</div>
                 <div class="input-group">
                     <div class="input-wrapper">
-                        <input type="number" class="input-field" id="threshold" placeholder="ex) 120" min="0" max="1023" value="120">
+                        <input type="number" class="input-field" id="threshold" placeholder="ex) 120" min="0" max="1023">
                     </div>
                 </div>
 
                 <div class="row-grid" style="margin-bottom: 16px;">
                     <button class="btn btn-success id="btn-cds-submit" onclick="setThreshold()"><i class="fa-solid fa-play"></i>CDS START</button>
-                    <button class="btn btn-danger id="btn-cds-off" onclick="stopCDS()">Set <i class="fa-solid fa-stop"></i>CDS OFF</button>
+                    <button class="btn btn-danger id="btn-cds-off" onclick="stopCDS()"><i class="fa-solid fa-stop"></i>CDS OFF</button>
                 </div>
                 <div class="status-bar">
                     <span>Status: <strong id="cds-status" style="color: #64748b;">Inactive</strong></span>

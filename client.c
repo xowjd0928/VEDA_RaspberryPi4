@@ -57,6 +57,58 @@ void send_request(const char* path) {
     close(sock);
 }
 
+void* client_log_thread(void* arg) {
+    char buffer[1024];
+    
+    while(1) {
+        int sock = socket(AF_INET, SOCK_STREAM, 0);
+        if (sock < 0) {
+            perror("socket");
+            exit(1);
+        }
+
+        struct sockaddr_in server;
+        server.sin_family = AF_INET;
+        server.sin_port = htons(SERVER_PORT);
+        inet_pton(AF_INET, SERVER_IP, &server.sin_addr);
+
+        if (connect(sock, (struct sockaddr*)&server, sizeof(server)) < 0) {
+            close(sock);
+            perror("connect");
+            exit(1);
+        }
+
+        char request[256];
+        sprintf(request, "GET /get_cds_data HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", SERVER_IP);
+        send(sock, request, strlen(request), 0);
+
+        int n = recv(sock, buffer, sizeof(buffer) - 1, 0);
+        if (n > 0) {
+            buffer[n] = '\0';
+            // HTTP 바디(데이터)만 추출
+            char* body = strstr(buffer, "\r\n\r\n");
+            if (body != NULL) {
+                body += 4;
+                
+                int reading = 0, threshold = 0;
+                sscanf(body, "%d,%d", &reading, &threshold);
+                if (reading == 0 && threshold == 0) continue;
+
+                // ⭐ client_cds.log 파일에 1초마다 기록 무한 누적
+                FILE* log_fp = fopen("client_cds.log", "a");
+                if (log_fp != NULL) {
+                    time_t now = time(NULL);
+                    struct tm* t = localtime(&now);
+                    fprintf(log_fp, "[%02d:%02d:%02d] Current CDS: %d (Threshold: %d)\n", 
+                            t->tm_hour, t->tm_min, t->tm_sec, reading, threshold);
+                    fclose(log_fp);
+                }
+            }
+        }
+        close(sock);
+        sleep(1); // 1초마다 반복 수행
+    }
+}
 
 int main() {
     sigset_t sigset;
@@ -64,6 +116,13 @@ int main() {
     sigfillset(&sigset);
     sigdelset(&sigset, SIGINT);
     sigprocmask(SIG_SETMASK, &sigset, NULL);
+
+    pthread_t thread;
+    if (pthread_create(&thread, NULL, client_log_thread, NULL)) {
+        perror("pthread_create");
+        exit(1);
+    }
+    pthread_detach(thread);
 
     int choice;
 

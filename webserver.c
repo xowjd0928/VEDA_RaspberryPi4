@@ -185,6 +185,7 @@ int main(int argc, char **argv) {
     pinMode(G, OUTPUT);
     softPwmCreate(LED, 0, 100);
     softToneCreate(SPKR);
+    remove("current_cds.log");
 
     /* 서버를 위한 소켓을 생성한다. */
     ssock = socket(AF_INET, SOCK_STREAM, 0);
@@ -358,6 +359,7 @@ void *clnt_connection(void *arg) {
             perror("pthread_create");
             exit(1);
         }
+        char protocol[] = "HTTP/1.1 200 OK\r\n";
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "cds_off") == 0) {
@@ -365,7 +367,35 @@ void *clnt_connection(void *arg) {
             pthread_cancel(cds_thread);
             pthread_join(cds_thread, NULL);
         }
+        remove("current_cds.log");
         sendOk(clnt_write);
+        goto END;
+    } else if (strcmp(filename, "get_cds_data") == 0) {
+        int reading = 0, threshold = 0;
+        int file_exists = 0;
+        
+        FILE* cur_log = fopen("current_cds.log", "r");
+        if(cur_log != NULL) {
+            fscanf(cur_log, "%d %d", &reading, &threshold);
+            fclose(cur_log);
+            file_exists = 1;
+        }
+
+        char response_header[] = 
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/plain\r\n"
+            "Connection: close\r\n\r\n";
+            
+        char body[64];
+        if (file_exists) {
+            sprintf(body, "%d,%d", reading, threshold);
+        } else {
+            sprintf(body, "0,0");
+        }
+        
+        fputs(response_header, clnt_write);
+        fputs(body, clnt_write);
+        fflush(clnt_write);
         goto END;
     } else if (strcmp(filename, "buzzer_on") == 0) {
         if (buzzer_thread != 0) {

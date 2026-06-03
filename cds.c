@@ -2,6 +2,10 @@
 
 void cds_function(int* threshold) {
     FILE* log = fopen("cds.log", "a");
+    if (log == NULL) {
+        perror("fopen cds.log");
+        return;
+    }
     int fd;
     int a2dChannel = 0;
     int prev, a2dVal;
@@ -31,6 +35,12 @@ void cds_function(int* threshold) {
             fprintf(log, "[%02d:%02d:%02d] Current CDS Value: %d (Dark)\n", t->tm_hour, t->tm_min, t->tm_sec, a2dVal);
             fflush(log);
             softPwmWrite(LED, 100);
+        }
+
+        FILE* cur_log = fopen("current_cds.log", "w");
+        if (cur_log != NULL) {
+            fprintf(cur_log, "%d %d", a2dVal, *threshold);
+            fclose(cur_log);
         }
         delay(1000);
         cnt++;
