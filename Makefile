@@ -2,23 +2,29 @@ OBJS = led.o cds.o buzzer.o segment.o
 ARM_CC = aarch64-linux-gnu-gcc
 MFLAGS = -ldl -lpthread
 RFLAGS = -lwiringPi -lcrypt
+USER = taejeong
+HOST = 100.82.123.25
+REMOTE = $(USER)@$(HOST):~/
 
-all: webserver librasp.so index client
+all: webserver librasp.so client ui
 
 webserver: webserver.o
 	$(ARM_CC) -o $@ webserver.o $(MFLAGS) $(RFLAGS)
-	-scp webserver taejeong@100.82.123.25:~/
+	-scp webserver $(REMOTE)
+	
+webserver.o: webserver.c
+	$(ARM_CC) -c $<
 
 librasp.so: $(OBJS)
 	$(ARM_CC) -shared -o $@ $(OBJS) $(RFLAGS)
-	-scp librasp.so taejeong@100.82.123.25:~/
-
-index:
-	-scp index.html taejeong@100.82.123.25:~/
-	-scp style.css taejeong@100.82.123.25:~/
+	-scp librasp.so $(REMOTE)
 
 client: client.c
-	$(CC) -o $@ client.c
+	$(CC) -o $@ client.c $(MFLAGS)
+
+ui:
+	-scp index.html $(REMOTE)
+	-scp style.css $(REMOTE)
 
 %.o: %.c
 	$(ARM_CC) -c -fPIC $<
