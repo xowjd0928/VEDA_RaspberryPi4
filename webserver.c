@@ -367,6 +367,7 @@ void *clnt_connection(void *arg) {
             pthread_cancel(cds_thread);
             pthread_join(cds_thread, NULL);
         }
+        softPwmWrite(LED, 0);
         remove("current_cds.log");
         sendOk(clnt_write);
         goto END;

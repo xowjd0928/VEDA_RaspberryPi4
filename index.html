@@ -59,12 +59,12 @@
                 </div>
 
                 <div class="row-grid" style="margin-bottom: 16px;">
-                    <button class="btn btn-success id="btn-cds-submit" onclick="setThreshold()"><i class="fa-solid fa-play"></i>CDS START</button>
-                    <button class="btn btn-danger id="btn-cds-off" onclick="stopCDS()"><i class="fa-solid fa-stop"></i>CDS OFF</button>
+                    <button class="btn btn-success" id="btn-cds-submit" onclick="setThreshold()"><i class="fa-solid fa-play"></i> CDS START</button>
+                    <button class="btn btn-danger" id="btn-cds-off" onclick="stopCDS()"><i class="fa-solid fa-stop"></i> CDS OFF</button>
                 </div>
                 <div class="status-bar">
                     <span>Status: <strong id="cds-status" style="color: #64748b;">Inactive</strong></span>
-                    <span>Current Threshold: <strong id="current-threshold">0</strong></span>
+                    <span style="text-align: right;">Current Thsreshold: <strong id="current-threshold">0</strong></span>
                 </div>
             </div>
 
@@ -108,7 +108,7 @@
                     document.getElementById('cds-status').innerText = "Active";
                     document.getElementById('cds-status').style.color = "#52c41a"; // 활성화: 초록색
                 });
-            }
+        }
 
         function stopCDS() {
             // 서버로 종료 명령 전송
