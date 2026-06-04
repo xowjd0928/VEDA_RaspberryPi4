@@ -230,7 +230,7 @@ void handle_cds() {
     }
 
     sprintf(cds_path, "cds_start/%d", threshold);
-    printf("Check client_cds.log!");
+    printf("Check client_cds.log!\n");
     send_request(cds_path);
 }
 
@@ -257,12 +257,17 @@ void handle_segment() {
     send_request(seg_path);
 }
 
+/**
+ * @brief 라즈베리파이 웹서버와 소켓 통신을 열어 
+ * 지정된 HTTP GET 을 요청하고 응답을 콘솔에 출력한다.
+ */
 void send_request(char* path) {
     int sock;
     struct sockaddr_in server;
     char request[1024];
     char buffer[4096];
 
+    // 소켓 생성 및 서버 연결
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
         perror("socket");
@@ -279,6 +284,7 @@ void send_request(char* path) {
         return;
     }
 
+    // HTTP GET 요청
     sprintf(request,
         "GET /%s HTTP/1.1\r\n"
         "Host: %s\r\n"
@@ -287,11 +293,20 @@ void send_request(char* path) {
 
     send(sock, request, strlen(request), 0);
 
+    // 응답 출력
     int n;
     while ((n = recv(sock, buffer, sizeof(buffer) - 1, 0)) > 0) {
         buffer[n] = '\0';
-        printf("%s", buffer);
+        if (strstr(buffer, "200 OK")) {
+            if (strstr(path, "led")) printf("LED Control Completed\n");
+            if (strstr(path, "cds")) printf("CDS Control Completed\n");
+            if (strstr(path, "buz")) printf("Buzzer Control Completed\n");
+            if (strstr(path, "seg")) printf("Segment Control Completed\n");
+        } else {
+            printf("Failed\n");
+        }
     }
 
     close(sock);
+    sleep(1);
 }
