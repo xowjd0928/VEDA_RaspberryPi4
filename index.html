@@ -37,10 +37,10 @@
                     <div class="icon-wrapper icon-buzzer"><i class="fa-solid fa-volume-high"></i></div>
                     Buzzer Control
                 </div>
-                <button class="btn btn-success" id="btn-buzzer-on" style="margin-bottom: 16px; width: 100%;" onclick="fetch('/buzzer_on')">
+                <button class="btn btn-success" id="btn-buzzer-on" style="margin-bottom: 16px; width: 100%;" onclick="buzzerOn()">
                     <i class="fa-solid fa-play"></i> BUZZER ON
                 </button>
-                <button class="btn btn-danger" id="btn-buzzer-off" style="width: 100%;" onclick="fetch('/buzzer_off')">
+                <button class="btn btn-danger" id="btn-buzzer-off" style="width: 100%;" onclick="buzzerOff()">
                     <i class="fa-solid fa-square"></i> BUZZER OFF
                 </button>
             </div>
@@ -92,6 +92,25 @@
     <script>
         let webTimerInterval = null;
 
+        function resetWebTimerState() {
+            if (webTimerInterval) {
+                clearInterval(webTimerInterval);
+                webTimerInterval = null;
+            }
+            document.getElementById('web-timer-display').innerText = "0";
+            document.getElementById('count').value = "";
+        }
+
+        function buzzerOn() {
+            resetWebTimerState();
+            fetch('/buzzer_on');
+        }
+
+        function buzzerOff() {
+            resetWebTimerState();
+            fetch('/buzzer_off');
+        }
+
         function startWebCountdown(startNum) {
             const display = document.getElementById('web-timer-display');
             let currentNum = startNum;
@@ -104,8 +123,7 @@
                 if (currentNum >= 0) {
                     display.innerText = currentNum;
                 } else {
-                    clearInterval(webTimerInterval);
-                    display.innerText = "0"; // 카운트다운 만료 시 0으로 안전 복귀
+                    resetWebTimerState();
                 }
             }, 1000);
         }
@@ -126,7 +144,7 @@
             fetch('/segment_start/' + num)
                 .then(r => {
                     if(r.ok) {
-                        startWebCountdown(num); // 서버에서 통신 승인 떨어지면 클라이언트 타이머 구동
+                        startWebCountdown(num);
                     }
                 });
         }

@@ -6,6 +6,7 @@
  * @param arg LED 제어 문자열
  */
 void led_function(char* arg) {
+    pthread_cleanup_push(free, arg);
     if (arg != NULL) {
         if (strcmp(arg, "OFF") == 0) {
             softPwmWrite(LED, 0);
@@ -17,4 +18,5 @@ void led_function(char* arg) {
             softPwmWrite(LED, 100);
         }
     }
+    pthread_cleanup_pop(1);
 }

@@ -61,8 +61,8 @@ void* client_log_thread(void* arg) {
         // 소켓 생성 및 서버 연결
         int sock = socket(AF_INET, SOCK_STREAM, 0);
         if (sock < 0) {
-            perror("socket");
-            exit(1);
+            sleep(1);
+            continue;
         }
 
         struct sockaddr_in server;
@@ -72,8 +72,8 @@ void* client_log_thread(void* arg) {
 
         if (connect(sock, (struct sockaddr*)&server, sizeof(server)) < 0) {
             close(sock);
-            perror("connect");
-            exit(1);
+            sleep(1);
+            continue;
         }
         
         // HTTP GET 으로 CDS 데이터 요청
@@ -93,7 +93,11 @@ void* client_log_thread(void* arg) {
                 sscanf(body, "%d,%d", &reading, &threshold);
 
                 // CDS Inactive시 무시
-                if (reading == 0 && threshold == 0) continue;
+                if (reading == 0 && threshold == 0) {
+                    close(sock);
+                    sleep(1);
+                    continue;
+                }
 
                 // 로그파일에 CDS 값 기록
                 FILE* log = fopen("client_cds.log", "a");
@@ -298,13 +302,14 @@ void send_request(char* path) {
 
     // 응답 출력
     int n;
-    while ((n = recv(sock, buffer, sizeof(buffer) - 1, 0)) > 0) {
+    n = recv(sock, buffer, sizeof(buffer) - 1, 0);
+    if (n > 0) {
         buffer[n] = '\0';
         if (strstr(buffer, "200 OK")) {
             if (strstr(path, "led")) printf("LED Control Completed\n");
-            if (strstr(path, "cds")) printf("CDS Control Completed\n");
-            if (strstr(path, "buz")) printf("Buzzer Control Completed\n");
-            if (strstr(path, "seg")) printf("Segment Control Completed\n");
+            else if (strstr(path, "cds")) printf("CDS Control Completed\n");
+            else if (strstr(path, "buz")) printf("Buzzer Control Completed\n");
+            else if (strstr(path, "seg")) printf("Segment Control Completed\n");
         } else {
             printf("Failed\n");
         }

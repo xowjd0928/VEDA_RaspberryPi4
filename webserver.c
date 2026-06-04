@@ -60,18 +60,18 @@ int main(int argc, char **argv) {
 
     while(1) {
         char mesg[BUFSIZ];
-        int csock;
+        int* csock = malloc(sizeof(int));
 
         // 클라이언트 요청 대기
         len = sizeof(cliaddr);
-        csock = accept(ssock, (struct sockaddr*)&cliaddr, &len);
+        *csock = accept(ssock, (struct sockaddr*)&cliaddr, &len);
 
         inet_ntop(AF_INET, &cliaddr.sin_addr, mesg, BUFSIZ);
         printf("Client IP : %s:%d\n", mesg, ntohs(cliaddr.sin_port));
 
         // 클라이언트 요청 처리
-        pthread_create(&thread, NULL, clnt_connection, &csock);
-        pthread_join(thread, NULL);
+        pthread_create(&thread, NULL, clnt_connection, csock);
+        pthread_detach(thread);
     }
     return 0;
 }
@@ -175,6 +175,7 @@ void wiringpi_init() {
 void *clnt_connection(void *arg) {
     // 스레드를 통해서 넘어온 arg를 int 형의 파일 디스크립터로 변환한다
     int csock = *((int*)arg);
+    free(arg);
     FILE *clnt_read, *clnt_write;
     char reg_line[BUFSIZ], reg_buf[BUFSIZ];
     char method[BUFSIZ], type[BUFSIZ];
@@ -218,100 +219,117 @@ void *clnt_connection(void *arg) {
     
     // 각각의 HTTP GET 요청에 맞는 함수를 실행한다.
     if (strcmp(filename, "led_on") == 0) {
+
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
             pthread_join(cds_thread, NULL);
         }
+
         pthread_t thread;
         char* arg = strdup("ON");
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
         }
+
         pthread_join(thread, NULL);
-        free(arg);
         remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "led_off") == 0) {
+
         if(cds_thread != 0) {
             pthread_cancel(cds_thread);
             pthread_join(cds_thread, NULL);
         }
+
         pthread_t thread;
         char* arg = strdup("OFF");
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
         }
+
         pthread_join(thread, NULL);
-        free(arg);
         remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
+
     } else if (strcmp(filename, "led_low") == 0) {
+
         if(cds_thread != 0) {
             pthread_cancel(cds_thread);
             pthread_join(cds_thread, NULL);
         }
+
         pthread_t thread;
         char* arg = strdup("LOW");
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
         }
+
         pthread_join(thread, NULL);
-        free(arg);
         remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
+
     } else if (strcmp(filename, "led_medium") == 0) {
+
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
             pthread_join(cds_thread, NULL);
         }
+
         pthread_t thread;
         char* arg = strdup("MEDIUM");
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
         }
+
         pthread_join(thread, NULL);
-        free(arg);
         remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
+
     } else if (strcmp(filename, "led_high") == 0) {
+
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
             pthread_join(cds_thread, NULL);
         }
+
         pthread_t thread;
         char* arg = strdup("HIGH");
         if (pthread_create(&thread, NULL, led_function, arg)) {
             perror("pthread_create");
             exit(1);
         }
+
         pthread_join(thread, NULL);
-        free(arg);
         remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
-    } 
-    else if (strncmp(filename, "cds_start/", 10) == 0) {
+
+    } else if (strncmp(filename, "cds_start/", 10) == 0) {
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
             pthread_join(cds_thread, NULL);
         }
+
         int* threshold = malloc(sizeof(int));
         *threshold = atoi(filename + 10);
         if (pthread_create(&cds_thread, NULL, cds_function, threshold)) {
             perror("pthread_create");
             exit(1);
         }
+
         sendOk(clnt_write);
         goto END;
+
     } else if (strcmp(filename, "cds_off") == 0) {
+
         if (cds_thread != 0) {
             pthread_cancel(cds_thread);
             pthread_join(cds_thread, NULL);
@@ -320,7 +338,9 @@ void *clnt_connection(void *arg) {
         remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
+
     } else if (strcmp(filename, "get_cds_data") == 0) {
+
         int reading = 0, threshold = 0;
         int file_exists = 0;
         
@@ -347,11 +367,19 @@ void *clnt_connection(void *arg) {
         fputs(body, clnt_write);
         fflush(clnt_write);
         goto END;
+        
     } else if (strcmp(filename, "buzzer_on") == 0) {
+
         if (buzzer_thread != 0) {
             pthread_cancel(buzzer_thread);
             pthread_join(buzzer_thread, NULL);
         }
+
+        if (segment_thread != 0) {
+            pthread_cancel(segment_thread);
+            pthread_join(segment_thread, NULL);
+        }
+
         char* arg = strdup("ON");
         if (pthread_create(&buzzer_thread, NULL, buzzer_function, arg)) {
             perror("pthread_create");
@@ -359,34 +387,60 @@ void *clnt_connection(void *arg) {
         }
         sendOk(clnt_write);
         goto END;
+
     } else if (strcmp(filename, "buzzer_off") == 0) {
+
         if (buzzer_thread != 0) {
             pthread_cancel(buzzer_thread);
             pthread_join(buzzer_thread, NULL);
         }
+
+        if (segment_thread != 0) {
+            pthread_cancel(segment_thread);
+            pthread_join(segment_thread, NULL);
+        }
+
         char* arg = strdup("OFF");
         if (pthread_create(&buzzer_thread, NULL, buzzer_function, arg)) {
             perror("pthread_create");
             exit(1);
         }
+
         pthread_join(buzzer_thread, NULL);
         sendOk(clnt_write);
         goto END;
-    } else if (strncmp(filename, "segment_start/", 14) == 0) {
-        int num = atoi(filename + 14);
 
+    } else if (strncmp(filename, "segment_start/", 14) == 0) {
+        
+        int num = atoi(filename + 14);
         int* arg = malloc(sizeof(int));
         *arg = num;
+
+        if (buzzer_thread != 0) {
+            pthread_cancel(buzzer_thread);
+            pthread_join(buzzer_thread, NULL);
+        }
+
+        char* arg2 = strdup("OFF");
+        if (pthread_create(&buzzer_thread, NULL, buzzer_function, arg2)) {
+            perror("pthread_create");
+            exit(1);
+        }
+
+        pthread_join(buzzer_thread, NULL);
+        
         if (segment_thread != 0) {
             pthread_cancel(segment_thread);
             pthread_join(segment_thread, NULL);
         }
+
         if (pthread_create(&segment_thread, NULL, segment_function, arg)) {
             perror("pthread_create");
             exit(1);
         }
         sendOk(clnt_write);
         goto END;
+
     }
 
     // 메시지 헤더를 읽어서 화면에 출력하고 나머지는 무시한다.
@@ -439,13 +493,18 @@ int sendData(FILE* fp, char *ct, char *filename) {
     fputs(end, fp);
 
     fd = open(filename, O_RDWR); 		// 파일을 연다.
-    do {
-        len = read(fd, buf, BUFSIZ); 		// 파일을 읽어서 클라이언트로 보낸다.
-        fputs(buf, fp);
-    } while(len == BUFSIZ);
+    if (fd == -1) {
+        perror("open()");
+        return -1;
+    }
+    // 파일을 읽어서 클라이언트로 보낸다.
+    
+    while ((len = read(fd, buf, BUFSIZ)) > 0) {
+        fwrite(buf, 1, len, fp);
+    }
 
-    close(fd); 					// 파일을 닫는다.
-
+    close(fd); 				// 파일을 닫는다.
+    fflush(fp);
     return 0;
 }
 
