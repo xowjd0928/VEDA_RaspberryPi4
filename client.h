@@ -28,6 +28,7 @@ void print_menu();
 
 /**
  * @brief 표준 입력으로부터 안전하게 정수 데이터를 읽어온다.
+ * 
  * @return 입력받은 정수값, 예외 발생 시 -1
  */
 int read_int();
@@ -39,14 +40,18 @@ void log_thread_init();
 
 /**
  * @brief 백그라운드에서 주기적으로 CDS 로그를 기록하는 스레드 함수
+ * 
  * @param arg 스레드 생성 인자
+ * 
  * @return void* 스레드 종료 상태 포인터
  */
 void* client_log_thread(void* arg);
 
 /**
  * @brief 사용자가 선택한 메뉴 번호에 따라 제어 로직을 실행한다.
+ * 
  * @param choice 선택한 메뉴 번호
+ * 
  * @return 1을 반환하면 메인 루프 유지, 0을 반환하면 프로그램 종료
  */
 int execute_menu(int choice);
@@ -63,6 +68,7 @@ void handle_segment();
 
 /**
  * @brief 지정된 URL 경로로 HTTP GET 요청 명령을 서버에 전송한다.
+ * 
  * @param path 요청할 URL 경로
  */
 void send_request(char* path);

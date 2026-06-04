@@ -51,6 +51,7 @@ void log_thread_init() {
 /**
  * @brief 1초 주기로 라즈베리파이 웹서버와 통신하여 실시간 CDS 값을 
  * 가져오고 CDS 로그 파일에 기록한다.
+ * 
  * @param arg 스레드 생성 인자
  */
 void* client_log_thread(void* arg) {
@@ -132,6 +133,7 @@ void print_menu() {
 
 /**
  * @brief 표준 입력에서 정수만 반환하고 버퍼에 남아있는 문자를 제거한다.
+ * 
  * @return 입력받은 정수값, 예외 발생 시 -1
  */
 int read_int() {
@@ -155,6 +157,7 @@ int read_int() {
 
 /**
  * @brief 메뉴로부터 넘겨받은 사용자 선택지에 따라 제어 요청을 실행한다.
+ * 
  * @param choice 사용자 선택 메뉴 번호
  */
 int execute_menu(int choice) {
