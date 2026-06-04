@@ -196,6 +196,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;       /* 상하 중앙 맞춤으로 삐뚤어짐 방지 */
+    gap: 20px;
     background-color: #0f172a;
     border: 1px solid #1e293b;
     border-radius: 10px;

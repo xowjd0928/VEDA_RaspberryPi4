@@ -64,7 +64,8 @@
                 </div>
                 <div class="status-bar">
                     <span>Status: <strong id="cds-status" style="color: #64748b;">Inactive</strong></span>
-                    <span style="text-align: right;">Current Thsreshold: <strong id="current-threshold">0</strong></span>
+                    <span>Current Reading: <strong id="current-reading">-</strong></span>
+                    <span style="text-align: right;">Current Threshold: <strong id="current-threshold">-</strong></span>
                 </div>
             </div>
 
@@ -101,14 +102,27 @@
             }
     
             // 서버로 작동 명령 전송
-            fetch('/cds_start/' + val)
-                .then(() => {
-                    // 성공 시 화면 UI를 작동 중(Active) 상태로 변경
-                    document.getElementById('current-threshold').innerText = val;
-                    document.getElementById('cds-status').innerText = "Active";
-                    document.getElementById('cds-status').style.color = "#52c41a"; // 활성화: 초록색
-                });
+            fetch('/cds_start/' + val);
         }
+
+        setInterval(() => {
+            fetch('/get_cds_data')
+                .then(r => r.text())
+                .then(data => {
+                    const [reading, threshold] = data.split(',');
+                    if (reading === '0' && threshold === '0') {
+                        document.getElementById('cds-status').innerText = "Inactive";
+                        document.getElementById('cds-status').style.color = "#64748b";
+                        document.getElementById('current-reading').textContent = '-';
+                        document.getElementById('current-threshold').textContent = '-';
+                        return;
+                    }
+                document.getElementById('current-reading').textContent = reading;
+                document.getElementById('current-threshold').textContent = threshold;
+                document.getElementById('cds-status').innerText = "Active";
+                document.getElementById('cds-status').style.color = "#52c41a";
+                });
+        }, 1000);
 
         function stopCDS() {
             // 서버로 종료 명령 전송
@@ -117,8 +131,8 @@
                     // 성공 시 화면 UI를 대기(Inactive) 상태로 변경
                     document.getElementById('cds-status').innerText = "Inactive";
                     document.getElementById('cds-status').style.color = "#64748b"; // 비활성화: 회색
-                    document.getElementById('current-threshold').innerText = "0"; // 임계값 초기화
-                    alert('CDS OFF');
+                    document.getElementById('current-threshold').innerText = "-"; // 임계값 초기화
+                    document.getElementById('current-reading').innerText = "-"; // 현재값 초기화
                 });
         }
 
@@ -136,9 +150,6 @@
             }
 
             fetch('/segment_start/' + num)
-                .then(response => {
-                    alert('Segment timer set to ' + val + ' seconds');
-                });
         }
     </script>
 </body>

@@ -230,6 +230,7 @@ void *clnt_connection(void *arg) {
         }
         pthread_join(thread, NULL);
         free(arg);
+        remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "led_off") == 0) {
@@ -245,6 +246,7 @@ void *clnt_connection(void *arg) {
         }
         pthread_join(thread, NULL);
         free(arg);
+        remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "led_low") == 0) {
@@ -260,6 +262,7 @@ void *clnt_connection(void *arg) {
         }
         pthread_join(thread, NULL);
         free(arg);
+        remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "led_medium") == 0) {
@@ -275,6 +278,7 @@ void *clnt_connection(void *arg) {
         }
         pthread_join(thread, NULL);
         free(arg);
+        remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "led_high") == 0) {
@@ -290,6 +294,7 @@ void *clnt_connection(void *arg) {
         }
         pthread_join(thread, NULL);
         free(arg);
+        remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
     } 
