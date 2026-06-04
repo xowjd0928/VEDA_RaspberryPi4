@@ -6,7 +6,6 @@
     <title>Raspberry Pi Control Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -74,6 +73,9 @@
                     <div class="icon-wrapper icon-timer"><i class="fa-solid fa-hourglass-half"></i></div>
                     Countdown Timer
                 </div>
+                
+                <div class="digital-clock" id="web-timer-display">0</div>
+
                 <div class="section-label">Duration (Seconds, 0-9)</div>
                 <div class="input-group">
                     <div class="input-wrapper">
@@ -88,52 +90,24 @@
     </div>
 
     <script>
-        function setThreshold() {
-            const val = document.getElementById('threshold').value;
-            if (val === '') {
-                alert('Input Threshold Value!');
-                return;
-            }
+        let webTimerInterval = null;
 
-            const num = Number(val);
-            if (!Number.isInteger(num) || num < 0 || num > 1023) {
-                alert('Please enter a number between 0 and 1023.');
-                return;
-            }
-    
-            // 서버로 작동 명령 전송
-            fetch('/cds_start/' + val);
-        }
+        function startWebCountdown(startNum) {
+            const display = document.getElementById('web-timer-display');
+            let currentNum = startNum;
 
-        setInterval(() => {
-            fetch('/get_cds_data')
-                .then(r => r.text())
-                .then(data => {
-                    const [reading, threshold] = data.split(',');
-                    if (reading === '0' && threshold === '0') {
-                        document.getElementById('cds-status').innerText = "Inactive";
-                        document.getElementById('cds-status').style.color = "#64748b";
-                        document.getElementById('current-reading').textContent = '-';
-                        document.getElementById('current-threshold').textContent = '-';
-                        return;
-                    }
-                document.getElementById('current-reading').textContent = reading;
-                document.getElementById('current-threshold').textContent = threshold;
-                document.getElementById('cds-status').innerText = "Active";
-                document.getElementById('cds-status').style.color = "#52c41a";
-                });
-        }, 1000);
+            if (webTimerInterval) clearInterval(webTimerInterval);
+            display.innerText = currentNum;
 
-        function stopCDS() {
-            // 서버로 종료 명령 전송
-            fetch('/cds_off')
-                .then(() => {
-                    // 성공 시 화면 UI를 대기(Inactive) 상태로 변경
-                    document.getElementById('cds-status').innerText = "Inactive";
-                    document.getElementById('cds-status').style.color = "#64748b"; // 비활성화: 회색
-                    document.getElementById('current-threshold').innerText = "-"; // 임계값 초기화
-                    document.getElementById('current-reading').innerText = "-"; // 현재값 초기화
-                });
+            webTimerInterval = setInterval(() => {
+                currentNum--;
+                if (currentNum >= 0) {
+                    display.innerText = currentNum;
+                } else {
+                    clearInterval(webTimerInterval);
+                    display.innerText = "0"; // 카운트다운 만료 시 0으로 안전 복귀
+                }
+            }, 1000);
         }
 
         function setCount() {
@@ -150,6 +124,56 @@
             }
 
             fetch('/segment_start/' + num)
+                .then(r => {
+                    if(r.ok) {
+                        startWebCountdown(num); // 서버에서 통신 승인 떨어지면 클라이언트 타이머 구동
+                    }
+                });
+        }
+
+        function setThreshold() {
+            const val = document.getElementById('threshold').value;
+            if (val === '') {
+                alert('Input Threshold Value!');
+                return;
+            }
+
+            const num = Number(val);
+            if (!Number.isInteger(num) || num < 0 || num > 1023) {
+                alert('Please enter a number between 0 and 1023.');
+                return;
+            }
+    
+            fetch('/cds_start/' + val);
+        }
+
+        setInterval(() => {
+            fetch('/get_cds_data')
+                .then(r => r.text())
+                .then(data => {
+                    const [reading, threshold] = data.split(',');
+                    if (reading === '0' && threshold === '0') {
+                        document.getElementById('cds-status').innerText = "Inactive";
+                        document.getElementById('cds-status').style.color = "#64748b";
+                        document.getElementById('current-reading').textContent = '-';
+                        document.getElementById('current-threshold').textContent = '-';
+                        return;
+                    }
+                    document.getElementById('current-reading').textContent = reading;
+                    document.getElementById('current-threshold').textContent = threshold;
+                    document.getElementById('cds-status').innerText = "Active";
+                    document.getElementById('cds-status').style.color = "#52c41a";
+                });
+        }, 1000);
+
+        function stopCDS() {
+            fetch('/cds_off')
+                .then(() => {
+                    document.getElementById('cds-status').innerText = "Inactive";
+                    document.getElementById('cds-status').style.color = "#64748b";
+                    document.getElementById('current-threshold').innerText = "-";
+                    document.getElementById('current-reading').innerText = "-";
+                });
         }
     </script>
 </body>
