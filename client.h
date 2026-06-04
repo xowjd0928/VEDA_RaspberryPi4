@@ -1,10 +1,3 @@
-/**
- * @file client.h
- * @brief 콘솔 클라이언트 인터페이스 (CLI)
- * @author taejeong
- * @date 2026-06-04
- */
-
 #pragma once
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +33,7 @@ void print_menu();
 int read_int();
 
 /**
- * @brief CDS 로그 기록을 위한 스레드를 초기화한다.
+ * @brief 클라이언트용 CDS 로그 기록을 위한 스레드를 초기화한다.
  */
 void log_thread_init();
 
