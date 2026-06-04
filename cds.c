@@ -11,7 +11,7 @@
  * @param threshold CDS 임계값
  */
 void cds_function(int* threshold) {
-    FILE* log = fopen("/tmp/cds.log", "a");
+    FILE* log = fopen("cds.log", "a");
     if (log == NULL) {
         perror("fopen cds.log");
         return;

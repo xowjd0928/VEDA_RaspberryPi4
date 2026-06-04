@@ -17,6 +17,9 @@
 #include <sys/stat.h>
 #include <sys/resource.h>
 
+// 라즈베리파이 홈 디렉토리
+#define HOME_PATH "/home/taejeong"
+
 // LED가 연결된 GPIO 핀 번호
 #define LED 1
 

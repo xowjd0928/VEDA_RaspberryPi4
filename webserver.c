@@ -115,8 +115,8 @@ void daemonize(char* arg) {
         perror("sigaction() : Can't ignore SIGHUP");
     }
 
-    // 프로세스의 워킹 디렉터리를 ‘/’로 설정한다
-    if(chdir("/") < 0) {
+    // 프로세스의 워킹 디렉터리를 홈으로 설정한다
+    if(chdir(HOME_PATH) < 0) {
         perror("cd()");
     }
 
@@ -162,7 +162,7 @@ void wiringpi_init() {
     pinMode(G, OUTPUT);
     softPwmCreate(LED, 0, 100);
     softToneCreate(SPKR);
-    remove("/tmp/current_cds.log");
+    remove("current_cds.log");
 }
 /**
  * @brief 클라이언트 HTTP 요청을 처리한다.
@@ -312,14 +312,14 @@ void *clnt_connection(void *arg) {
             pthread_join(cds_thread, NULL);
         }
         softPwmWrite(LED, 0);
-        remove("/tmp/current_cds.log");
+        remove("current_cds.log");
         sendOk(clnt_write);
         goto END;
     } else if (strcmp(filename, "get_cds_data") == 0) {
         int reading = 0, threshold = 0;
         int file_exists = 0;
         
-        FILE* cur_log = fopen("/tmp/current_cds.log", "r");
+        FILE* cur_log = fopen("current_cds.log", "r");
         if(cur_log != NULL) {
             fscanf(cur_log, "%d %d", &reading, &threshold);
             fclose(cur_log);
