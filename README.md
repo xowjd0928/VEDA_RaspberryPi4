@@ -195,6 +195,11 @@ CDS 센서의 동작 로그를 기록한다.
 client_cds_log
 ```
 
+예시:
+
+```text
+[12:31:08] Current CDS: 220 (Threshold: 180)
+
 ### client_cds.log
 
 CDS 센서의 동작 로그를 클라이언트가 볼 수 있게 기록한다.
