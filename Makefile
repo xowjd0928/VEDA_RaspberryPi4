@@ -34,4 +34,4 @@ ui:
 	$(ARM_CC) -c -fPIC $<
 
 clean:
-	rm -f *.o webserver librasp.so client
+	rm -f *.o webserver librasp.so client client_cds.log
