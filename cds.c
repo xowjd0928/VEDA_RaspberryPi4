@@ -11,7 +11,7 @@
  * @param threshold CDS 임계값
  */
 void cds_function(int* threshold) {
-    FILE* log = fopen("cds.log", "a");
+    FILE* log = fopen("/tmp/cds.log", "a");
     if (log == NULL) {
         perror("fopen cds.log");
         return;
@@ -53,7 +53,7 @@ void cds_function(int* threshold) {
         }
 
         // client용 로그를 위한 최신 CDS 값 기록
-        FILE* cur_log = fopen("current_cds.log", "w");
+        FILE* cur_log = fopen("/tmp/current_cds.log", "w");
         if (cur_log != NULL) {
             fprintf(cur_log, "%d %d", a2dVal, *threshold);
             fclose(cur_log);

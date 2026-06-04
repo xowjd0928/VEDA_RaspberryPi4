@@ -4,19 +4,13 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-// 7세그멘트 A GPIO 핀 번호
+// 7세그먼트 A~G GPIO 핀 번호
 #define A 21
-// 7세그멘트 B GPIO 핀 번호
 #define B 22
-// 7세그멘트 C GPIO 핀 번호
 #define C 23
-// 7세그멘트 D GPIO 핀 번호
 #define D 24
-// 7세그멘트 E GPIO 핀 번호
 #define E 25
-// 7세그멘트 F GPIO 핀 번호
 #define F 26
-// 7세그멘트 G GPIO 핀 번호
 #define G 27
 
 // 부저 핀 번호
