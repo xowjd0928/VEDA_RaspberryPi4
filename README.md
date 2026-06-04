@@ -59,10 +59,23 @@ client.h 내부의 SERVER_IP 및 SERVER_PORT 값을 수정한다.
 #define SERVER_PORT 60000
 ```
 
-* SERVER_IP : Raspberry Pi 서버 IP
-* SERVER_PORT : 서버 포트 번호
+- SERVER_IP : Raspberry Pi 서버 IP
+- SERVER_PORT : 서버 포트 번호
 
 ---
+
+## 3. webserver.h 수정
+
+webserver.h 내부의 USER_HOME_PATH 값을 수정한다.
+
+예시:
+
+```c
+#define USER_HOME_PATH "/home/taejeong"
+```
+
+- USER_HOME_PATH : Raspberry Pi 홈 디렉토리
+
 
 # 빌드
 
