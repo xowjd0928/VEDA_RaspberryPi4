@@ -1,4 +1,5 @@
 OBJS = led.o cds.o buzzer.o segment.o
+CC = gcc
 ARM_CC = aarch64-linux-gnu-gcc
 MFLAGS = -ldl -lpthread
 RFLAGS = -lwiringPi -lcrypt
@@ -19,8 +20,11 @@ librasp.so: $(OBJS)
 	$(ARM_CC) -shared -o $@ $(OBJS) $(RFLAGS)
 	-scp librasp.so $(REMOTE)
 
-client: client.c
+client: client.o
 	$(CC) -o $@ client.c $(MFLAGS)
+
+client.o: client.c
+	$(CC) -c $<
 
 ui:
 	-scp index.html $(REMOTE)

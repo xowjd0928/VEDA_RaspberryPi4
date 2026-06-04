@@ -117,9 +117,9 @@ void print_menu() {
     printf("\n========== MENU ==========\n");
     printf("1. LED ON\n");
     printf("2. LED OFF\n");
-    printf("3. LED BRIGHT\n");
-    printf("4. LED MIDDLE\n");
-    printf("5. LED DIM\n");
+    printf("3. LED LOW\n");
+    printf("4. LED MED\n");
+    printf("5. LED HIGH\n");
     printf("6. CDS START\n");
     printf("7. CDS STOP\n");
     printf("8. BUZZER ON\n");
@@ -230,6 +230,7 @@ void handle_cds() {
     }
 
     sprintf(cds_path, "cds_start/%d", threshold);
+    printf("Check client_cds.log!");
     send_request(cds_path);
 }
 
