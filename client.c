@@ -316,5 +316,4 @@ void send_request(char* path) {
     }
 
     close(sock);
-    sleep(1);
 }

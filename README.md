@@ -64,19 +64,6 @@ client.h 내부의 SERVER_IP 및 SERVER_PORT 값을 수정한다.
 
 ---
 
-## 3. webserver.h 수정
-
-webserver.h 내부의 USER_HOME_PATH 값을 수정한다.
-
-예시:
-
-```c
-#define USER_HOME_PATH "/home/taejeong"
-```
-
-- USER_HOME_PATH : Raspberry Pi 홈 디렉토리
-
-
 # 빌드
 
 Ubuntu 터미널에서 다음 명령어를 실행한다.
@@ -258,23 +245,3 @@ taejeong   17796       1  2 09:20 ?        00:01:17 ./webserver 60000
 ```bash
 kill 17796
 ```
-
----
-
-### 코딩 스타일 및 규칙
-
-본 프로젝트는 하단의 코딩 스타일 가이드를 따른다.
-
-스타일 가이드에는 다음 내용이 포함되어 있다.
-
-- 브랜치 네이밍 규칙
-- 코드 포맷팅 규칙
-- 주석 작성 규칙
-- 식별자 명명 규칙
-- HTML / CSS / JavaScript 작성 규칙
-
-자세한 내용은 아래 문서를 참고한다.
-
-[STYLE.md](STYLE.md)
-
- 

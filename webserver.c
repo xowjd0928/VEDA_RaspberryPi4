@@ -116,7 +116,7 @@ void daemonize(char* arg) {
     }
 
     // 프로세스의 워킹 디렉터리를 홈으로 설정한다
-    if(chdir(USER_HOME_PATH) < 0) {
+    if(chdir(".") < 0) {
         perror("cd()");
     }
 
