@@ -16,6 +16,8 @@
 1. CLI(Client Program)
 2. Web UI(Browser)
 
+> 코딩 스타일은 [STYLE.md](STYLE.md)를 참고한다.
+
 ---
 
 # 실행 환경
