@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
     // 소켓 생성 및 서버 시작
     ssock = socket(AF_INET, SOCK_STREAM, 0);
     if(ssock == -1) {
-        perror("socket()");
+        syslog(LOG_ERR, "socket()");
         return -1;
     }
 
@@ -48,13 +48,13 @@ int main(int argc, char **argv) {
     servaddr.sin_port = (argc != 2)?htons(8000):htons(atoi(argv[1]));
     // 서버 바인딩
     if(bind(ssock, (struct sockaddr *)&servaddr, sizeof(servaddr))==-1) {
-        perror("bind()");
+        syslog(LOG_ERR, "bind()");
         return -1;
     }
     
     // 최대 10개 클라이언트 연결 대기
     if(listen(ssock, 10) == -1) {
-        perror("listen()");
+        syslog(LOG_ERR, "listen()");
         return -1;
     }
 
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
         *csock = accept(ssock, (struct sockaddr*)&cliaddr, &len);
 
         inet_ntop(AF_INET, &cliaddr.sin_addr, mesg, BUFSIZ);
-        printf("Client IP : %s:%d\n", mesg, ntohs(cliaddr.sin_port));
+        syslog(LOG_INFO, "Client IP : %s:%d\n", mesg, ntohs(cliaddr.sin_port));
 
         // 클라이언트 요청 처리
         pthread_create(&thread, NULL, clnt_connection, csock);
@@ -95,11 +95,13 @@ void daemonize(char* arg) {
     // 사용할 수 있는 최대의 파일 디스크립터 수 얻기
     if(getrlimit(RLIMIT_NOFILE, &rl) < 0) {
         perror("getlimit()");
+        exit(1);
     }
 
     // ppid 1로 고정
     if((pid = fork()) < 0) {
         perror("error()");
+        exit(1);
     } else if(pid != 0) {
         exit(0);
     }
@@ -113,11 +115,13 @@ void daemonize(char* arg) {
     sa.sa_flags = 0;
     if(sigaction(SIGHUP, &sa, NULL) < 0) {
         perror("sigaction() : Can't ignore SIGHUP");
+        exit(1);
     }
 
     // 프로세스의 워킹 디렉터리를 홈으로 설정한다
     if(chdir(".") < 0) {
         perror("cd()");
+        exit(1);
     }
 
     // 프로세스의 모든 파일 디스크립터 닫기
@@ -188,8 +192,8 @@ void *clnt_connection(void *arg) {
     // 한 줄의 문자열을 읽어서 reg_line 변수에 저장한다.
     fgets(reg_line, BUFSIZ, clnt_read);
     
-    // reg_line 변수에 문자열을 화면에 출력한다.
-    fputs(reg_line, stdout);
+    // reg_line 변수에 문자열을 로그에 기록한다.
+    syslog(LOG_INFO, "%s", reg_line);
 
     // ' ' 문자로 reg_line을 구분해서 요청 라인의 내용(메소드)를 분리한다.
     ret = strtok(reg_line, "/ ");
@@ -228,7 +232,7 @@ void *clnt_connection(void *arg) {
         pthread_t thread;
         char* arg = strdup("ON");
         if (pthread_create(&thread, NULL, led_function, arg)) {
-            perror("pthread_create");
+            syslog(LOG_ERR, "pthread_create");
             exit(1);
         }
 
@@ -246,7 +250,7 @@ void *clnt_connection(void *arg) {
         pthread_t thread;
         char* arg = strdup("OFF");
         if (pthread_create(&thread, NULL, led_function, arg)) {
-            perror("pthread_create");
+            syslog(LOG_ERR, "pthread_create");
             exit(1);
         }
 
@@ -265,7 +269,7 @@ void *clnt_connection(void *arg) {
         pthread_t thread;
         char* arg = strdup("LOW");
         if (pthread_create(&thread, NULL, led_function, arg)) {
-            perror("pthread_create");
+            syslog(LOG_ERR, "pthread_create");
             exit(1);
         }
 
@@ -284,7 +288,7 @@ void *clnt_connection(void *arg) {
         pthread_t thread;
         char* arg = strdup("MEDIUM");
         if (pthread_create(&thread, NULL, led_function, arg)) {
-            perror("pthread_create");
+            syslog(LOG_ERR, "pthread_create");
             exit(1);
         }
 
@@ -303,7 +307,7 @@ void *clnt_connection(void *arg) {
         pthread_t thread;
         char* arg = strdup("HIGH");
         if (pthread_create(&thread, NULL, led_function, arg)) {
-            perror("pthread_create");
+            syslog(LOG_ERR, "pthread_create");
             exit(1);
         }
 
@@ -321,7 +325,7 @@ void *clnt_connection(void *arg) {
         int* threshold = malloc(sizeof(int));
         *threshold = atoi(filename + 10);
         if (pthread_create(&cds_thread, NULL, cds_function, threshold)) {
-            perror("pthread_create");
+            syslog(LOG_ERR, "pthread_create");
             exit(1);
         }
 
@@ -382,7 +386,7 @@ void *clnt_connection(void *arg) {
 
         char* arg = strdup("ON");
         if (pthread_create(&buzzer_thread, NULL, buzzer_function, arg)) {
-            perror("pthread_create");
+            syslog(LOG_ERR, "pthread_create");
             exit(1);
         }
         sendOk(clnt_write);
@@ -402,7 +406,7 @@ void *clnt_connection(void *arg) {
 
         char* arg = strdup("OFF");
         if (pthread_create(&buzzer_thread, NULL, buzzer_function, arg)) {
-            perror("pthread_create");
+            syslog(LOG_ERR, "pthread_create");
             exit(1);
         }
 
@@ -423,7 +427,7 @@ void *clnt_connection(void *arg) {
 
         char* arg2 = strdup("OFF");
         if (pthread_create(&buzzer_thread, NULL, buzzer_function, arg2)) {
-            perror("pthread_create");
+            syslog(LOG_ERR, "pthread_create");
             exit(1);
         }
 
@@ -435,7 +439,7 @@ void *clnt_connection(void *arg) {
         }
 
         if (pthread_create(&segment_thread, NULL, segment_function, arg)) {
-            perror("pthread_create");
+            syslog(LOG_ERR, "pthread_create");
             exit(1);
         }
         sendOk(clnt_write);
@@ -443,10 +447,9 @@ void *clnt_connection(void *arg) {
 
     }
 
-    // 메시지 헤더를 읽어서 화면에 출력하고 나머지는 무시한다.
+    // 메시지 헤더를 읽고 나머지는 무시한다.
     do {
         fgets(reg_line, BUFSIZ, clnt_read);
-        fputs(reg_line, stdout);
         strcpy(reg_buf, reg_line);
         char* buf = strchr(reg_buf, ':');
     } while(strncmp(reg_line, "\r\n", 2)); 	// 요청 헤더는 ‘\r\n’으로 끝난다.
@@ -494,7 +497,7 @@ int sendData(FILE* fp, char *ct, char *filename) {
 
     fd = open(filename, O_RDWR); 		// 파일을 연다.
     if (fd == -1) {
-        perror("open()");
+        syslog(LOG_ERR, "open");
         return -1;
     }
     // 파일을 읽어서 클라이언트로 보낸다.
@@ -538,7 +541,7 @@ void sendError(FILE* fp) {
     // 화면에 표시될 HTML의 내용
     char content1[ ] = "<html><head><title>BAD Connection</title></head>";
     char content2[ ] = "<body><font size=+5>Bad Request</font></body></html>";
-    printf("send_error\n");
+    syslog(LOG_WARNING, "send_error");
 
     fputs(protocol, fp);
     fputs(server, fp);
@@ -560,7 +563,7 @@ void* led_function(void* arg) {
     char* error;
     handle = dlopen("./librasp.so", RTLD_LAZY);
     if (!handle) {
-        fprintf(stderr, "%s\n", dlerror());
+        syslog(LOG_ERR, "%s", dlerror());
         exit(1);
     }
     dlerror();
@@ -568,7 +571,7 @@ void* led_function(void* arg) {
     fptr = dlsym(handle, "led_function");
     error = dlerror();
     if (error != NULL) {
-        fprintf(stderr, "%s\n", error);
+        syslog(LOG_ERR, "%s", error);
         exit(1);
     }
 
@@ -589,7 +592,7 @@ void* cds_function(void* arg) {
 
     handle = dlopen("./librasp.so", RTLD_LAZY);
     if (!handle) {
-        fprintf(stderr, "%s\n", dlerror());
+        syslog(LOG_ERR, "%s", dlerror());
         exit(1);
     }
     dlerror();
@@ -597,7 +600,7 @@ void* cds_function(void* arg) {
     fptr = dlsym(handle, "cds_function");
     error = dlerror();
     if (error != NULL) {
-        fprintf(stderr, "%s\n", error);
+        syslog(LOG_ERR, "%s", error);
         exit(1);
     }
 
@@ -618,7 +621,7 @@ void* buzzer_function(void* arg) {
 
     handle = dlopen("./librasp.so", RTLD_LAZY);
     if (!handle) {
-        fprintf(stderr, "%s\n", dlerror());
+        syslog(LOG_ERR, "%s", dlerror());
         exit(1);
     }
     dlerror();
@@ -626,7 +629,7 @@ void* buzzer_function(void* arg) {
     fptr = dlsym(handle, "buzzer_function");
     error = dlerror();
     if (error != NULL) {
-        fprintf(stderr, "%s\n", error);
+        syslog(LOG_ERR, "%s", error);
         exit(1);
     }
 
@@ -647,7 +650,7 @@ void* segment_function(void* arg) {
 
     handle = dlopen("./librasp.so", RTLD_LAZY);
     if (!handle) {
-        fprintf(stderr, "%s\n", dlerror());
+        syslog(LOG_ERR, "%s", dlerror());
         exit(1);
     }
     dlerror();
@@ -655,7 +658,7 @@ void* segment_function(void* arg) {
     fptr = dlsym(handle, "segment_function");
     error = dlerror();
     if (error != NULL) {
-        fprintf(stderr, "%s\n", error);
+        syslog(LOG_ERR, "%s", error);
         exit(1);
     }
 
