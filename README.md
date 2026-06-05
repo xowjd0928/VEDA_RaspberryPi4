@@ -46,8 +46,6 @@ HOST = 100.82.123.25
 - USER : Raspberry Pi 로그인 계정
 - HOST : Raspberry Pi IP 주소
 
----
-
 ## 2. client.h 수정
 
 client.h 내부의 SERVER_IP 및 SERVER_PORT 값을 수정한다.
@@ -62,9 +60,7 @@ client.h 내부의 SERVER_IP 및 SERVER_PORT 값을 수정한다.
 - SERVER_IP : Raspberry Pi 서버 IP
 - SERVER_PORT : 서버 포트 번호
 
----
-
-# 빌드
+## 3. 빌드
 
 Ubuntu 터미널에서 다음 명령어를 실행한다.
 
@@ -74,7 +70,7 @@ make
 
 ---
 
-# 서버 실행
+## 4. 서버 실행
 
 라즈베리파이 터미널에서 다음 명령어를 실행한다.
 
@@ -96,9 +92,7 @@ make
 
 사용자는 CLI 또는 Web UI 중 하나를 선택하여 사용할 수 있다.
 
----
-
-# 방법 1 : CLI 사용
+## 방법 1 : CLI 사용
 
 Ubuntu 터미널에서 다음 명령어를 실행한다.
 
@@ -128,9 +122,7 @@ Ubuntu 터미널에서 다음 명령어를 실행한다.
 
 메뉴 번호를 입력하여 기능을 실행한다.
 
----
-
-# 방법 2 : Web UI 사용
+## 방법 2 : Web UI 사용
 
 웹 브라우저를 열고 다음 주소로 접속한다.
 
@@ -184,12 +176,16 @@ CDS 센서의 동작 로그를 기록한다.
 예시:
 
 ```text
-425 300
+126 100
 ```
 
 ---
 
 ## 클라이언트 로그 파일
+
+### client_cds.log
+
+CDS 센서의 동작 로그를 클라이언트가 볼 수 있게 기록한다.
 
 ```text
 client_cds_log
@@ -201,10 +197,7 @@ client_cds_log
 [12:31:08] Current CDS: 220 (Threshold: 180)
 ```
 
-### client_cds.log
-
-CDS 센서의 동작 로그를 클라이언트가 볼 수 있게 기록한다.
-
+---
 
 # 종료 방법
 
@@ -225,23 +218,7 @@ Ctrl + C
 서버 종료 시:
 
 ```bash
-ps -ef | grep webserver
-```
-입력 후
-
-```bash
-kill <webserver pid>
+killall webserver
 ```
 
-를 입력한다.
-
-예시: 
-
-```bash
-ps -ef | grep webserver
-taejeong   17796       1  2 09:20 ?        00:01:17 ./webserver 60000
-```
-
-```bash
-kill 17796
-```
+을 입력한다.
