@@ -34,7 +34,23 @@
 
 # 사전 설정
 
-## 1. Makefile 수정
+## 1. 하드웨어 핀 연결
+
+WiringPi 핀 번호 기준이다.
+
+| 장치 | WiringPi 핀 |
+|------|------------|
+| LED | 1 |
+| Buzzer | 6 |
+| Segment A | 21 |
+| Segment B | 22 |
+| Segment C | 23 |
+| Segment D | 24 |
+| Segment E | 25 |
+| Segment F | 26 |
+| Segment G | 27 |
+
+## 2. Makefile 수정
 
 Makefile 내부의 USER 및 HOST 값을 자신의 환경에 맞게 수정한다.
 
@@ -48,7 +64,7 @@ HOST = 100.82.123.25
 - USER : Raspberry Pi 로그인 계정
 - HOST : Raspberry Pi IP 주소
 
-## 2. client.h 수정
+## 3. client.h 수정
 
 client.h 내부의 SERVER_IP 및 SERVER_PORT 값을 수정한다.
 
@@ -62,7 +78,7 @@ client.h 내부의 SERVER_IP 및 SERVER_PORT 값을 수정한다.
 - SERVER_IP : Raspberry Pi 서버 IP
 - SERVER_PORT : 서버 포트 번호
 
-## 3. 빌드
+## 4. 빌드
 
 Ubuntu 터미널에서 다음 명령어를 실행한다.
 
@@ -72,7 +88,7 @@ make
 
 ---
 
-## 4. 서버 실행
+## 5. 서버 실행
 
 라즈베리파이 터미널에서 다음 명령어를 실행한다.
 

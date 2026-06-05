@@ -7,7 +7,7 @@
 #include <softPwm.h>
 #include <stdlib.h>
 
-// CSD 스위치 핀 GPIO 번호
+// CDS 스위치 핀 GPIO 번호
 #define SW 5
 
 // CDS 센서 GPIO 번호
